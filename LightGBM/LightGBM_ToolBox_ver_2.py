@@ -47,6 +47,11 @@ from datetime import datetime
 from contextlib import contextmanager
 from sklearn.model_selection import *
 from sklearn.metrics import mean_squared_error
+from .config.lgb_booster_core_params import *
+from .config.lgb_default_settings import *
+from .utils.lgb_customized_functions import *
+from bayes_opt.observer import JSONLogger
+from bayes_opt.event import Events
 
 class MyLight(object):
     '''
@@ -87,9 +92,10 @@ class MyLight(object):
         # Record system time to keep log names and other solutions consistent:
         self.start_time = MyLight.tic()
 
-        # Config files dir:
-        self.__lgb_booster_core_params_file = self.__translate_file_dir('./LightGBM/config/lgb_booster_core_params.json')
-        self.__lgb_default_settings_file = self.__translate_file_dir('./LightGBM/config/lightgbm_default_settings.json')
+        # Truncated:
+        # # Config files dir:
+        # self.__lgb_booster_core_params_file = self.__translate_file_dir('./LightGBM/config/lgb_booster_core_params.json')
+        # self.__lgb_default_settings_file = self.__translate_file_dir('./LightGBM/config/lightgbm_default_settings.json')
 
         # Initialize logging.
         self.__init_logging(log_dir=log_dir)
@@ -129,6 +135,7 @@ class MyLight(object):
             logging.error('Failed in creating model checkpoint dir. Error: {}'.format(e))
             raise
 
+    # May need to truncate this for future:
     def __translate_file_dir(self, file_dir):
         _abs_dir = os.getcwd()
         return os.path.realpath(os.path.join(_abs_dir, file_dir))
@@ -177,24 +184,30 @@ class MyLight(object):
     def __retrieve_lgb_default_setting(self):
 
         try:
-            # Read default booster params:
-            with open(self.__lgb_booster_core_params_file, 'r') as booster_params_file:
-                self.__lgb_default_booster_params = json.load(booster_params_file)
+            # Truncated:
+            # # Read default booster params:
+            # with open(self.__lgb_booster_core_params_file, 'r') as booster_params_file:
+            #     self.__lgb_default_booster_params = json.load(booster_params_file)
             # Read default objectives and metrics:
-            with open(self.__lgb_default_settings_file, 'r') as file:
-                self.__lgb_default_settings = json.load(file)
-                self.__lgb_reg_objectives = self.__lgb_default_settings['regression-objectives']
-                self.__lgb_binary_objectives = self.__lgb_default_settings['binary-objectives']
-                self.__lgb_multiclass_objectives = self.__lgb_default_settings['multi-class-objectives']
-                self.__lgb_cross_entropy_objectives = self.__lgb_default_settings['cross-entropy-objectives']
-                self.__lgb_lambdarank_objectives = self.__lgb_default_settings['lambdarank-objectives']
-                self.__lgb_default_metrics = self.__lgb_default_settings['default-metrics']
-                # Make a full list of default objectives:
-                self.__lgb_default_objectives = self.__lgb_reg_objectives + self.__lgb_binary_objectives + \
-                                                self.__lgb_multiclass_objectives + self.__lgb_cross_entropy_objectives + \
-                                                self.__lgb_lambdarank_objectives
-                self.__lgb_clf_objectives = self.__lgb_binary_objectives + self.__lgb_multiclass_objectives + \
-                                            self.__lgb_cross_entropy_objectives
+            self.__lgb_default_booster_params = lgb_default_core_params
+            
+            # Truncated:
+            # with open(self.__lgb_default_settings_file, 'r') as file:
+                # self.__lgb_default_settings = json.load(file)
+            
+            self.__lgb_default_settings = lgb_default_settings
+            self.__lgb_reg_objectives = self.__lgb_default_settings['regression-objectives']
+            self.__lgb_binary_objectives = self.__lgb_default_settings['binary-objectives']
+            self.__lgb_multiclass_objectives = self.__lgb_default_settings['multi-class-objectives']
+            self.__lgb_cross_entropy_objectives = self.__lgb_default_settings['cross-entropy-objectives']
+            self.__lgb_lambdarank_objectives = self.__lgb_default_settings['lambdarank-objectives']
+            self.__lgb_default_metrics = self.__lgb_default_settings['default-metrics']
+            # Make a full list of default objectives:
+            self.__lgb_default_objectives = self.__lgb_reg_objectives + self.__lgb_binary_objectives + \
+                                            self.__lgb_multiclass_objectives + self.__lgb_cross_entropy_objectives + \
+                                            self.__lgb_lambdarank_objectives
+            self.__lgb_clf_objectives = self.__lgb_binary_objectives + self.__lgb_multiclass_objectives + \
+                                        self.__lgb_cross_entropy_objectives
         except Exception as e:
             error_msg = 'Failed in retrieving LightGBM default parameters, objectives and metrics. ' + \
                         'The file should be stored in a child folder ./config/ \n' + \
@@ -315,6 +328,14 @@ class MyLight(object):
             self.__bayes_opt_y = data.squeeze()
         else:
             raise TypeError('Data used for Bayesian optimization can only be pd.DataFrame or np.ndarray.')
+    
+    @property
+    def bayes_opt_metrics(self):
+        return self.__bayes_opt_metrics
+
+    @bayes_opt_metrics.setter
+    def bayes_opt_metrics(self, metrics):
+        self.__bayes_opt_metrics = metrics
 
     def get_booster_params(self):
         return self.__booster_params
@@ -420,7 +441,8 @@ class MyLight(object):
             # keep_training_booster=False,
             callbacks=None,
             inplace_class_model=True,
-            autosave_ckpt=True
+            autosave_ckpt=True,
+            analyze_feature_importance=False
             ):
         assert not isinstance(train_X, lgb.Dataset) and not isinstance(valid_X, lgb.Dataset), \
             'Training data cannot be lgb.Dataset.'
@@ -443,6 +465,11 @@ class MyLight(object):
         else:
             if learning_rate_decay_rate is not None:
                 learning_rates = lambda iter: learning_rate * (learning_rate_decay_rate ** iter)
+        _msg = 'Initial learning rate: {learning_rate}, adjustable learning rates: {learning_rates}'.format(
+            learning_rate=learning_rate,
+            learning_rates=learning_rates
+        )
+        logging.info(_msg)
 
         # After updating booster params, check if it's valid:
         # assert self.__precheck_input_params(__booster_params), \
@@ -531,13 +558,17 @@ class MyLight(object):
                     __trained_model.save_model(_ckpt_file)
                     logging.info('Save model artifact {}'.format(_ckpt_file))
 
-                return __trained_model
+                if analyze_feature_importance:
+                    feature_importance = self.analyze_feature_importance(__trained_model)
+                    return __trained_model, feature_importance
+                else:
+                    return __trained_model
         except Exception as e:
             print('Failed in training a LightGBM model. Error: {}'.format(e))
             logging.error('Failed in training a LightGBM model. Error: {}'.format(e))
             raise
 
-    def analyze_feature_importance(self, trained_model=None, top_features=20, plot=False, **kwargs):
+    def analyze_feature_importance(self, trained_model=None, top_features=20, **kwargs):
 
         if trained_model == None:
             _trained_model = self.trained_model
@@ -549,8 +580,9 @@ class MyLight(object):
             feature_importance['Features'] = _trained_model.feature_name()
             feature_importance['Importances'] = _trained_model.feature_importance().squeeze()
 
-            if plot:
-                plot_importance(_trained_model, max_num_features=top_features, figsize=(5,10))
+            # Truncated:
+            # if plot:
+            #     plot_importance(_trained_model, max_num_features=top_features, figsize=(5,10))
 
             return feature_importance
         except Exception as e:
@@ -717,7 +749,9 @@ class MyLight(object):
         print('For {}-folds cross validation, the {} is {:.5f}'.format(folds, loss_func, loss))
 
         if save_models:
-            return trained_models
+            return trained_models, preds
+        else:
+            return preds
 
     def __set_booster_params(self):
         __booster_params = {
@@ -769,7 +803,7 @@ class MyLight(object):
         if boosting <= 0.5:
             __booster_params = dict(
                 objective=self.__booster_params['objective'], # Define these two parameters in bayes_tuning.
-                metric=self.__booster_params['metric'],
+                metric=self.__bayes_opt_metrics,
                 boosting='gbdt',
                 min_split_gain=min_split_gain,
                 colsample_bytree=colsample_bytree,
@@ -785,7 +819,7 @@ class MyLight(object):
         else:
             __booster_params = dict(
                 objective=self.__booster_params['objective'],
-                metric=self.__booster_params['metric'],
+                metric=self.__bayes_opt_metrics,
                 boosting='dart',
                 min_split_gain=min_split_gain,
                 colsample_bytree=colsample_bytree,
@@ -806,7 +840,7 @@ class MyLight(object):
 
 
         __cv_results = self.lgb_cv(train_X=self.__bayes_opt_X, train_y=self.__bayes_opt_y, params=__booster_params,
-                                   num_iterations=50000, metrics=self.__booster_params['metric'],
+                                   num_iterations=50000, metrics=self.__bayes_opt_metrics,
                                    early_stopping_rounds=100, learning_rate=0.03
                                    )
 
@@ -819,20 +853,35 @@ class MyLight(object):
                      eval_func=None,
                      init_points=5,
                      n_iter=25,
-                     acq='ei',
-                     xi=0.0,
+                     mode='ei',
+                     # acq='ei',
+                     # xi=0.0,
                      learning_rate=0.03,
                      metric=None,
+                     random_state=7,
                      **kwargs):
         '''
         Attn For eval_func, the hyper-parameters have to be the same as stored dict. And adjust the postive/ negative
         return values accordingly by metrics.
         :param learning_rate: float or list.
-        # ref: https://github.com/fmfn/BayesianOptimization/blob/master/examples/exploitation%20vs%20exploration.ipynb
+        ref: https://github.com/fmfn/BayesianOptimization/blob/master/examples/exploitation%20vs%20exploration.ipynb
+        kwargs for Bayesian optimizer:
+        :param acq = 'ei'
+        :param xi=0.0
+        :param kappa
         '''
 
         if params == None:
             __params = self.__set_booster_params()
+
+        bayesian_optimizer_params = kwargs if kwargs is not None else {}
+
+        if mode == 'exploration':
+            bayesian_optimizer_params['acq'] = 'ucb'
+            bayesian_optimizer_params['kappa'] = 10
+        elif mode == 'ei' : # Expected Improvement
+            bayesian_optimizer_params['acq'] = 'ei'
+            bayesian_optimizer_params['xi'] = 1e-4
 
         # __params['objective'] = self.__booster_params['objective']
         #
@@ -852,11 +901,14 @@ class MyLight(object):
             #     bo.maximize(init_point=init_point, n_iter=n_iter, acq='ucb', kappa=10)
 
             if eval_func == None:
-                bo = BayesianOptimization(self.__eval_params_using_cv, __params)
+                bo = BayesianOptimization(self.__eval_params_using_cv, __params, random_state=random_state)
             else:
-                bo = BayesianOptimization(eval_func, __params)
+                bo = BayesianOptimization(eval_func, __params, random_state=random_state)
 
-            bo.maximize(init_points=init_points, n_iter=n_iter, acq=acq, xi=xi)
+            logger = JSONLogger(path=self.__translate_file_dir('BayesianOptimization_log.json'))
+            bo.subscribe(Events.OPTMIZATION_STEP, logger)
+
+            bo.maximize(init_points=init_points, n_iter=n_iter, **kwargs)
 
             opt_res = pd.DataFrame(bo.res['all']['params'])
             opt_res['values'] = bo.res['all']['values']
