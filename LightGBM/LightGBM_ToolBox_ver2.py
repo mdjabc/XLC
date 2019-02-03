@@ -529,7 +529,9 @@ class MyLight(object):
                     _ckpt_file = 'LightGBM_model_ckpt_{}'.format(_training_execution_time)
                     _ckpt_file = os.path.join(self.__checkpoint_dir, _ckpt_file)
                     __trained_model.save_model(_ckpt_file)
-                    logging.info('Save model artifact {}'.format(_ckpt_file))
+                    _msg = 'Save model artifact {}'.format(_ckpt_file)
+                    logging.info(_msg)
+                    print(_msg)
 
                 return __trained_model
         except Exception as e:
