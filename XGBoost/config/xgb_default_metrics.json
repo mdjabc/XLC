@@ -1,0 +1,1 @@
+["rmse", "mae", "logloss", "error", "error@t", "merror", "mlogloss", "auc", "ndcg", "map", "map@n", "map@n-", "poisson-nloglik", "gamma-nloglik", "cox-nloglix", "gamma-deviance", "tweedie-nloglik"]

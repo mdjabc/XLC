@@ -1,0 +1,1 @@
+{"regression": ["RMSE", "MAE", "MAPE", "Quantile", "QueryRMSE", "Poisson"], "others": ["LogLinQuantile", "Lq", "PairLogit", "PairLogitPairwise", "QuerySoftMax", "YetiRank", "YetiRankPairwise"], "classification": ["Logloss", "CrossEntropy", "MultiClass", "MultiClassOneVsAll"]}

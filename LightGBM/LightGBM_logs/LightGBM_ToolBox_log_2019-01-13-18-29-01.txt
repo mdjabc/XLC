@@ -1,0 +1,36 @@
+[01/13/2019 06:29:01 PM (Local Time)] INFO : Start logging...
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Randomly split training data into 70% to 30% using class random seed.
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Training data size: (354, 13), validation data size: (152, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Booster parameters: {'subsample_freq': 0, 'subsample_for_bin': 200000, 'reg_lambda': 0.0, 'colsample_bytree': 1.0, 'n_estimators': 100, 'class_weight': None, 'reg_alpha': 0.0, 'min_split_gain': 0.0, 'min_child_weight': 0.001, 'subsample': 1.0, 'max_depth': -1, 'min_child_samples': 20, 'boosting_type': 'gbdt', 'num_leaves': 31, 'num_iterations': 500, 'learning_rate': 0.1, 'seed': 7, 'n_jobs': 3, 'metrics': ['rmse']}
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Run training at: 2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Save model artifact ./LightGBM_model_checkpoints/LightGBM_model_ckpt_2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Start K-Fold cross validation (ensemble)...
+[01/13/2019 06:29:02 PM (Local Time)] INFO : 
+For fold 1...
+
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Training data size: (337, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Will use validation data sets provided by user.
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Validation data set size: (169, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Booster parameters: {'subsample_freq': 0, 'subsample_for_bin': 200000, 'reg_lambda': 0.0, 'colsample_bytree': 1.0, 'n_estimators': 100, 'class_weight': None, 'reg_alpha': 0.0, 'min_split_gain': 0.0, 'min_child_weight': 0.001, 'subsample': 1.0, 'max_depth': -1, 'min_child_samples': 20, 'boosting_type': 'gbdt', 'num_leaves': 31, 'num_iterations': 100, 'learning_rate': 0.0001, 'seed': 7, 'n_jobs': -1, 'metrics': ['rmse']}
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Run training at: 2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Save model artifact ./LightGBM_model_checkpoints/LightGBM_model_ckpt_2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : 
+For fold 2...
+
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Training data size: (337, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Will use validation data sets provided by user.
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Validation data set size: (169, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Booster parameters: {'subsample_freq': 0, 'subsample_for_bin': 200000, 'reg_lambda': 0.0, 'colsample_bytree': 1.0, 'n_estimators': 100, 'class_weight': None, 'reg_alpha': 0.0, 'min_split_gain': 0.0, 'min_child_weight': 0.001, 'subsample': 1.0, 'max_depth': -1, 'min_child_samples': 20, 'boosting_type': 'gbdt', 'num_leaves': 31, 'num_iterations': 100, 'learning_rate': 0.0001, 'seed': 7, 'n_jobs': -1, 'metrics': ['rmse']}
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Run training at: 2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Save model artifact ./LightGBM_model_checkpoints/LightGBM_model_ckpt_2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : 
+For fold 3...
+
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Training data size: (338, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Will use validation data sets provided by user.
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Validation data set size: (168, 13)
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Booster parameters: {'subsample_freq': 0, 'subsample_for_bin': 200000, 'reg_lambda': 0.0, 'colsample_bytree': 1.0, 'n_estimators': 100, 'class_weight': None, 'reg_alpha': 0.0, 'min_split_gain': 0.0, 'min_child_weight': 0.001, 'subsample': 1.0, 'max_depth': -1, 'min_child_samples': 20, 'boosting_type': 'gbdt', 'num_leaves': 31, 'num_iterations': 100, 'learning_rate': 0.0001, 'seed': 7, 'n_jobs': -1, 'metrics': ['rmse']}
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Run training at: 2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : Save model artifact ./LightGBM_model_checkpoints/LightGBM_model_ckpt_2019-01-13-18-29-02
+[01/13/2019 06:29:02 PM (Local Time)] INFO : For 3-folds cross validation, the rmse is 9.11613
+[01/13/2019 06:29:03 PM (Local Time)] INFO : Start logging...
